@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="es"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cotizador LCL Shun Feng</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root {
+  --p: #004BB3;
+  --p2: #185EBB;
+  --acc: #D31224;
+  --acc2: #a80e1b;
+  --bg: #f4f7fc;
+  --card: #ffffff;
+  --border: #92B3DE;
+  --text: #0b1a30;
+  --muted: #52667d;
+  }
+  body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);padding:16px;min-height:100vh}
+  .wrap{max-width:560px;margin:0 auto}
+  header{text-align:center;margin-bottom:24px}
+  .logo-bar{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px}
+  header h1{font-size:20px;font-weight:600;color:var(--p);letter-spacing:-0.3px}
+  header p{font-size:13px;color:var(--muted);margin-top:3px}
+  .card{background:var(--card);border:0.5px solid var(--border);border-radius:14px;padding:24px;margin-bottom:16px}
+  .section-title{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:7px}
+  .section-title::after{content:'';flex:1;height:0.5px;background:var(--border)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .fg{margin-bottom:14px}
+  label{display:block;font-size:12px;font-weight:500;color:var(--p);margin-bottom:5px}
+  .hint{font-size:11px;color:var(--muted);margin-top:3px}
+  input[type=text],input[type=number],select{
+    width:100%;padding:9px 12px;border:0.5px solid var(--border);border-radius:8px;
+    font-family:'IBM Plex Sans',sans-serif;font-size:14px;color:var(--text);
+    background:var(--card);transition:border-color 0.15s;outline:none;appearance: none;
+  }
+  input[type=text]:focus,input[type=number]:focus,select:focus{border-color:var(--p)}
+  input.err{border-color:var(--acc)!important}
+  .err-msg{font-size:11px;color:var(--acc);margin-top:3px}
+  .density-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:500;margin-top:5px}
+  .density-ok{background:#e6f4ec;color:#1d7a4a}
+  .density-mid{background:#fff3cd;color:#8a5c00}
+  .density-hi{background:#fde8ea;color:var(--acc2)}
+  .btn-calc {
+  background: var(--p);
+  box-shadow: 0 4px 12px rgba(0, 75, 179, 0.3);
+  transition: all 0.2s ease;
+  width:100%;padding:13px;border:none;border-radius:10px;
+  font-family:'IBM Plex Sans',sans-serif;font-size:15px;font-weight:600;
+  color:#fff;cursor:pointer;letter-spacing:0.2px;
+  }
+  .btn-calc:hover {
+  background: var(--p2);
+  box-shadow: 0 6px 16px rgba(0, 75, 179, 0.45);
+  }
+  .btn-calc:active{transform:scale(0.98)}
+  .results{display:none}
+  .res-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .res-title{font-size:13px;font-weight:600;color:var(--p)}
+  .badge-ts{font-size:11px;color:var(--muted);background:var(--bg);padding:3px 8px;border-radius:20px}
+  .res-row{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:0.5px solid var(--border);font-size:13px;gap:8px}
+  .res-row:last-of-type{border-bottom:none}
+  .res-label{color:var(--muted);display:flex;flex-direction:column;gap:3px;flex:1}
+  .res-label-sub{font-size:11px;color:#b0bec5}
+  .res-val{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500;color:var(--text);white-space:nowrap}
+  .res-total{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--p);border-radius:10px;margin-top:12px}
+  .res-total span{font-size:13px;color:rgba(255,255,255,0.75)}
+  .res-total strong{font-family:'IBM Plex Mono',monospace;font-size:20px;color:#fff;font-weight:600}
+  .alert-box{padding:11px 13px;border-radius:8px;font-size:12px;line-height:1.55;margin-top:10px;border-left:3px solid}
+  .alert-weight{background:#fff8e6;border-color:#f5c400;color:#8a5c00}
+  .alert-danger{background:#fde8ea;border-color:var(--acc);color:var(--acc2)}
+  .alert-info{background:#e8f0f6;border-color:var(--p);color:var(--p)}
+  .alert-box strong{display:block;margin-bottom:2px}
+  .tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;margin-left:5px;vertical-align:middle}
+  .tag-warn{background:#fff3cd;color:#8a5c00}
+  .tag-danger{background:#fde8ea;color:var(--acc2)}
+  .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .btn-sec{padding:10px;border-radius:9px;font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:var(--card);color:var(--text);transition:background 0.15s}
+  .btn-sec:hover{background:var(--bg)}
+  .btn-wa{background:#25D366;color:#fff;border-color:#25D366}
+  .btn-wa:hover{background:#1eb857;border-color:#1eb857}
+  .cbm-info{font-size:11px;color:var(--muted);background:var(--bg);padding:9px 12px;border-radius:7px;margin-top:8px;line-height:1.5}
+  
+  @media(max-width:480px){
+    .grid2{grid-template-columns:1fr}
+    .btn-row{grid-template-columns:1fr}
+    body{padding:12px}
+    .card{padding:18px}
+  }
+
+  /* --- INICIO: ESTILOS EXCLUSIVOS PARA IMPRESIÓN PDF --- */
+  .print-area { display: none; }
+  
+  @media print {
+    body { background: #fff !important; color: #000; padding: 0; margin: 0; }
+    /* Ocultamos por completo la calculadora del móvil */
+    .wrap { display: none !important; }
+    /* Mostramos y adaptamos la hoja tamaño carta */
+    .print-area { display: block; font-family: 'Arial', sans-serif; padding: 10px 30px; }
+    
+    .print-header { display: flex; align-items: center; border-bottom: 2px solid var(--acc); padding-bottom: 15px; margin-bottom: 20px; }
+    .print-header img { width: 140px; margin-right: 20px; }
+    .print-titles h2 { color: var(--p); margin: 0; font-size: 24px; font-weight: 800; letter-spacing: 0.5px; }
+    .print-titles h3 { color: var(--muted); margin: 0; font-size: 14px; font-weight: 500; margin-top: 2px;}
+    
+    .print-table-info { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
+    .print-table-info td { border: 1px solid #333; padding: 10px 12px; font-size: 12px; width: 50%; }
+    
+    .print-table-items { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    .print-table-items th { background: var(--acc); color: #fff; padding: 10px; font-size: 11px; font-weight: bold; border: 1px solid #333; text-align: center; text-transform: uppercase; }
+    .print-table-items td { border: 1px solid #333; padding: 10px; font-size: 12px; text-align: center; }
+    .print-table-items td:first-child { text-align: left; }
+    
+    .print-total-row td { background: var(--p); color: #fff; font-weight: bold; font-size: 14px; text-align: right; padding: 12px 15px; border: 1px solid #333;}
+    
+    .print-terms { margin-top: 25px; font-size: 10px; color: #444; line-height: 1.4; border-top: 1px solid #ddd; padding-top: 15px; }
+    .print-terms ul { margin: 8px 0 15px 25px; }
+    
+    @page { margin: 1cm; size: letter; }
+  }
+  /* --- FIN: ESTILOS IMPRESIÓN PDF --- */
+
+</style>
+ </head>
+ <body data-template-id="__page-root">
+  <div class="wrap">
+   <header>
+    <div class="logo-bar" style="margin-bottom: 15px;">
+      <img src="shunfeng-logo.jpeg" alt="Logística Shun Feng" style="max-width: 180px; height: auto;">
+    </div>
+    <h1 style="color: rgb(0, 75, 179); font-weight: 600; font-size: 20px;">Cotizador de Carga LCL</h1>
+    <p style="color: rgb(82, 102, 125); font-weight: 400; font-size: 13px;">Ladin Cloud / Shun Feng · Cálculo estimado de flete</p>
+   </header>
+
+   <div class="card canva-card">
+    <div class="section-title">Datos del Cliente</div>
+    <div class="fg">
+     <label for="cliente-nombre">Nombre y Apellido del Cliente</label>
+     <input type="text" id="cliente-nombre" placeholder="Ej: Juan Pérez">
+    </div>
+   </div>
+
+   <div class="card canva-card">
+    <div class="section-title">Dimensiones de la carga</div>
+    <div class="grid2">
+     <div class="fg">
+        <label for="vol">Volumen (CBM)</label> 
+        <input type="number" id="vol" step="0.001" min="0.001" max="30" placeholder="Ej: 1.500" oninput="onInput()">
+        <div class="hint">1 CBM = 1m × 1m × 1m</div>
+        <div id="vol-err" class="err-msg" style="display:none"></div>
+     </div>
+     <div class="fg">
+        <label for="wt">Peso (KG)</label> 
+        <input type="number" id="wt" step="0.1" min="0.1" max="30000" placeholder="Ej: 300" oninput="onInput()">
+        <div id="density-badge" style="margin-top:5px;display:none"></div>
+        <div id="wt-err" class="err-msg" style="display:none"></div>
+     </div>
+    </div>
+    <div class="cbm-info">ℹ Límite de densidad estándar: 499 kg/CBM. Superarlo activa recargo por sobrepeso.</div>
+   </div>
+
+   <div class="card canva-card">
+    <div class="section-title">Tipo de mercancía</div>
+    <div class="fg">
+      <label for="cat">Categoría</label> 
+      <select id="cat"> 
+        <option value="hogar">Artículos del Hogar</option> 
+        <option value="ferreteria">Carga General</option> 
+        <option value="cosmeticos">Cosméticos / Cuidado personal</option> 
+        <option value="maquinaria">Maquinaria Industrial</option> 
+      </select>
+    </div>
+    <div class="fg">
+      <label for="spe">Condición especial</label> 
+      <select id="spe"> 
+        <option value="ninguna">Carga general — sin recargo adicional</option> 
+        <option value="liquida">Mercancía líquida</option> 
+        <option value="inflamable">Inflamable / Explosivo</option> 
+        <option value="imitacion">Marca de imitación (infracción)</option> 
+        <option value="sensible">Bienes sensibles (esmalte, perfume…)</option> 
+      </select>
+    </div>
+   </div>
+
+   <div class="card canva-card">
+    <div class="section-title">Destino final</div>
+    <div class="fg">
+      <label for="dest">Estado de destino</label> 
+      <select id="dest"> 
+        <option value="130">Zulia, Táchira, Mérida</option> 
+        <option value="110">Trujillo, Barinas</option> 
+        <option value="80">Apure, Guárico</option> 
+        <option value="60">Portuguesa</option> 
+        <option value="20">Caracas, Aragua, Carabobo, Yaracuy, Lara</option> 
+      </select>
+      <div class="hint">Tarifa terrestre en USD/CBM según zona</div>
+    </div>
+   </div>
+   
+   <button class="btn-calc" onclick="calc()">Calcular presupuesto</button>
+
+   <div id="results" class="card results" style="margin-top:16px">
+    <div class="res-header">
+      <span class="res-title">Desglose de costos</span> 
+      <span class="badge-ts" id="ts-badge"></span>
+    </div>
+    <div id="breakdown"></div>
+    <div id="alerts"></div>
+    <div class="btn-row">
+      <button class="btn-sec" onclick="window.print()">Imprimir / PDF</button> 
+      <button class="btn-sec btn-wa" onclick="sendWA()">WhatsApp asesor</button>
+    </div>
+   </div>
+  </div>
+
+  <div id="print-view" class="print-area">
+    <div class="print-header">
+      <img src="shunfeng-logo.jpeg" alt="Logo Logística Shun Feng">
+      <div class="print-titles">
+        <h2>TRANSPORTE SHUN FENG</h2>
+        <h3>COTIZACIÓN VENEZUELA</h3>
+      </div>
+    </div>
+    
+    <table class="print-table-info">
+      <tr>
+        <td><strong>AGENCIA:</strong> LADIN CLOUD / LOGISTICA SHUNFENG</td>
+        <td><strong>FECHA:</strong> <span id="p-fecha"></span></td>
+      </tr>
+      <tr>
+        <td><strong>CLIENTE:</strong> <span id="p-cliente"></span></td>
+        <td><strong>MERCANCÍA:</strong> <span id="p-mercancia"></span></td>
+      </tr>
+    </table>
+
+    <table class="print-table-items">
+      <thead>
+        <tr>
+          <th>ITEMS</th>
+          <th>PRECIO UNI.</th>
+          <th>VOLUMEN / PESO</th>
+          <th>MODALIDAD</th>
+          <th>TOTAL ESTIMADO</th>
+        </tr>
+      </thead>
+      <tbody id="p-items">
+        </tbody>
+      <tr class="print-total-row">
+        <td colspan="4">TOTAL COTIZADO:</td>
+        <td>$<span id="p-total"></span></td>
+      </tr>
+    </table>
+
+    <div class="print-terms">
+      <p><strong>REGLAS DE DENSIDAD APLICABLES:</strong> El límite de densidad estándar es de 499 kg/CBM. En caso de superar este límite, se aplicarán los siguientes recargos en almacén:</p>
+      <ul>
+        <li>De 500 a 699 kg/CBM = Multiplicador 1.5x sobre tarifa base marítima y terrestre.</li>
+        <li>700 kg/CBM o más = Multiplicador 2.0x sobre tarifa base marítima y terrestre.</li>
+      </ul>
+      <p><strong>NOTA IMPORTANTE:</strong> Las tarifas mínimas fijas de $85 (marítimo) y $20 (terrestre) aplican a volúmenes menores a 0.125 CBM. Todo envío debe tener código de cliente y destino visible en sus etiquetas. Esta cotización es un <strong>estimado referencial</strong> basado en las medidas declaradas por el cliente. Las medidas finales e importes serán verificados al momento de ingresar la mercancía a nuestros almacenes en China.</p>
+    </div>
+  </div>
+  <script>
+let Q={};
+
+function onInput(){
+  const v=parseFloat(document.getElementById('vol').value);
+  const w=parseFloat(document.getElementById('wt').value);
+  const badge=document.getElementById('density-badge');
+  if(v>0&&w>0){
+    const d=w/v;
+    let cls,lbl;
+    if(d<500){cls='density-ok';lbl=`Densidad: ${d.toFixed(0)} kg/CBM — Normal`}
+    else if(d<700){cls='density-mid';lbl=`Densidad: ${d.toFixed(0)} kg/CBM — Recargo 1.5×`}
+    else{cls='density-hi';lbl=`Densidad: ${d.toFixed(0)} kg/CBM — Recargo 2.0×`}
+    badge.innerHTML=`<span class="density-badge ${cls}">${lbl}</span>`;
+    badge.style.display='block';
+  } else {badge.style.display='none';}
+}
+
+function validate(){
+  const v=parseFloat(document.getElementById('vol').value);
+  const w=parseFloat(document.getElementById('wt').value);
+  let ok=true;
+  const ve=document.getElementById('vol-err');
+  const we=document.getElementById('wt-err');
+  ve.style.display='none'; we.style.display='none';
+  document.getElementById('vol').classList.remove('err');
+  document.getElementById('wt').classList.remove('err');
+  if(!v||v<=0||v>30){
+    ve.textContent='Ingrese un volumen entre 0.001 y 30 CBM';ve.style.display='block';
+    document.getElementById('vol').classList.add('err');ok=false;
+  }
+  if(!w||w<=0||w>30000){
+    we.textContent='Ingrese un peso entre 0.1 y 30,000 KG';we.style.display='block';
+    document.getElementById('wt').classList.add('err');ok=false;
+  }
+  return ok;
+}
+
+function calc(){
+  if(!validate()) return;
+  const vol=parseFloat(document.getElementById('vol').value);
+  const wt=parseFloat(document.getElementById('wt').value);
+  const cat=document.getElementById('cat').value;
+  const spe=document.getElementById('spe').value;
+  const lr=parseFloat(document.getElementById('dest').value);
+  const destSel=document.getElementById('dest');
+  const destTxt=destSel.options[destSel.selectedIndex].text; // Muestra la ruta completa
+
+  const density=wt/vol;
+  const isMinVol=vol<0.125;
+
+  let mult=1, multLbl='';
+  if(density>=500&&density<700){mult=1.5;multLbl='1.5× sobrepeso'}
+  else if(density>=700){mult=2.0;multLbl='2.0× sobrepeso extremo'}
+
+  const pCat=cat==='maquinaria'?'ferreteria':cat;
+  let baseRate=0;
+  if(pCat==='hogar') baseRate=vol<=3?630:590;
+  else if(pCat==='ferreteria') baseRate=vol<=3?660:610;
+  else if(pCat==='cosmeticos') baseRate=vol<=3?780:730;
+
+  let seaFinal;
+  if(isMinVol){
+    seaFinal=85;
+  } else {
+    seaFinal=vol*baseRate*mult;
+  }
+
+  let landFinal;
+  if(isMinVol){
+    landFinal=20;
+  } else {
+    landFinal=vol*lr*mult;
+  }
+
+  let extras=[],extraTotal=0;
+  if(cat==='maquinaria'){
+    let m=0;
+    if(vol>=0.3&&vol<=0.5)m=300;
+    else if(vol>0.5&&vol<=0.8)m=500;
+    else if(vol>0.8&&vol<=1.1)m=800;
+    else if(vol>1.1&&vol<=1.5)m=1000;
+    else if(vol>1.5&&vol<=2.0)m=1500;
+    else if(vol>2.0&&vol<=3.0)m=2000;
+    else if(vol>3.0)m=2500;
+    if(m>0){extras.push({n:'Extra maquinaria industrial',v:m});extraTotal+=m;}
+  }
+  if(spe==='liquida'||spe==='inflamable'){
+    const r=vol<=1?180:(vol<=5?150:120);
+    const c=vol*r;
+    extras.push({n:`Extra ${spe==='liquida'?'mercancía líquida':'inflamable/explosivo'}`,v:c});
+    extraTotal+=c;
+  } else if(spe==='imitacion'){
+    const r=vol<=1?150:(vol<=5?120:100);
+    const c=vol*r;
+    extras.push({n:'Extra marca de imitación',v:c});extraTotal+=c;
+  } else if(spe==='sensible'){
+    const r=vol<=5?80:60;
+    const c=vol*r;
+    extras.push({n:'Extra bienes sensibles',v:c});extraTotal+=c;
+  }
+
+  const total=seaFinal+landFinal+extraTotal;
+  const catMap={hogar:"Artículos del Hogar",ferreteria:"Carga General",cosmeticos:"Cosméticos / Cuidado personal",maquinaria:"Maquinaria Industrial"};
+  const speMap={ninguna:"Carga general",liquida:"Mercancía líquida",inflamable:"Inflamable / Explosivo",imitacion:"Marca de imitación",sensible:"Bienes sensibles"};
+  const catTxt=catMap[cat]||cat;
+  const speTxt=speMap[spe]||spe;
+  
+  Q={vol,wt,density,destTxt,catTxt,speTxt,seaFinal,landFinal,extraTotal,extras,total,mult,multLbl,isMinVol,baseRate,lr};
+
+  const now=new Date();
+  document.getElementById('ts-badge').textContent=now.toLocaleDateString('es-VE',{day:'2-digit',month:'short',year:'numeric'});
+
+  const multTagSea = mult>1&&!isMinVol ? `<span class="tag tag-warn">${multLbl}</span>` : '';
+  const multTagLand = mult>1&&!isMinVol ? `<span class="tag tag-warn">${multLbl}</span>` : '';
+  const minTag = isMinVol ? `<span class="tag tag-danger">Mínimo fijo</span>` : '';
+
+  let html='';
+  html+=`<div class="res-row">
+    <span class="res-label">
+      Flete marítimo LCL${multTagSea}${minTag}
+      ${!isMinVol&&mult>1?`<span class="res-label-sub">Base $${(vol*baseRate).toFixed(2)} × ${mult}</span>`:''}
+    </span>
+    <span class="res-val">$${seaFinal.toFixed(2)}</span>
+  </div>`;
+  html+=`<div class="res-row">
+    <span class="res-label">
+      Flete terrestre · ${destTxt.split(',')[0]}…${multTagLand}${minTag}
+      ${!isMinVol&&mult>1?`<span class="res-label-sub">Base $${(vol*lr).toFixed(2)} × ${mult}</span>`:''}
+    </span>
+    <span class="res-val">$${landFinal.toFixed(2)}</span>
+  </div>`;
+  extras.forEach(e=>{
+    html+=`<div class="res-row">
+      <span class="res-label">${e.n}</span>
+      <span class="res-val">$${e.v.toFixed(2)}</span>
+    </div>`;
+  });
+  html+=`<div class="res-total"><span>Total estimado</span><strong>$${total.toFixed(2)}</strong></div>`;
+  document.getElementById('breakdown').innerHTML=html;
+
+  let alerts='';
+  if(isMinVol){
+    alerts+=`<div class="alert-box alert-danger">
+      <strong>⚠ Carga menor a 0.125 CBM — Confirmar con asesor</strong>
+      Los montos mostrados corresponden a tarifas mínimas fijas ($85 marítimo / $20 terrestre). 
+      ${mult>1?'Adicionalmente, esta carga presenta sobrepeso. ':''}Debido al volumen reducido${mult>1?' y la densidad elevada':''}, 
+      es obligatorio confirmar recargos exactos, viabilidad operativa y condiciones especiales directamente con el asesor antes de procesar el despacho.
+    </div>`;
+  }
+  if(mult>1&&!isMinVol){
+    alerts+=`<div class="alert-box alert-weight">
+      <strong>Evaluación de sobrepeso</strong>
+      Densidad registrada: <strong>${density.toFixed(0)} kg/CBM</strong> (límite estándar: 499 kg/CBM). 
+      Se aplica multiplicador <strong>${mult}×</strong> sobre flete marítimo y flete terrestre. 
+    </div>`;
+  }
+  if(cat==='maquinaria'&&vol>0&&vol<0.3&&!isMinVol){
+    alerts+=`<div class="alert-box alert-info">
+      <strong>Nota — Maquinaria pequeña</strong>
+      Para maquinaria menor a 0.3 CBM no se aplica extra tabular. Verifica con el asesor si corresponde algún cargo por manejo especial.
+    </div>`;
+  }
+
+  document.getElementById('alerts').innerHTML=alerts;
+  
+  updatePrintView();
+
+  document.getElementById('results').style.display='block';
+  document.getElementById('results').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function updatePrintView() {
+  const now = new Date();
+  document.getElementById('p-fecha').textContent = now.toLocaleDateString('es-VE');
+  
+  const nombre = document.getElementById('cliente-nombre').value.trim();
+  document.getElementById('p-cliente').textContent = nombre ? nombre : 'EN ESPERA DE ASIGNACIÓN';
+
+  let merc = Q.catTxt;
+  if (Q.speTxt !== 'Carga general') merc += ` (Condición: ${Q.speTxt})`;
+  document.getElementById('p-mercancia').textContent = merc;
+
+  let htmlItems = '';
+  
+  // Item Marítimo (Ambos datos reflejados en la columna Volumen / Peso)
+  const precioUniMar = Q.isMinVol ? 85.00 : (Q.baseRate * Q.mult);
+  htmlItems += `<tr>
+    <td>Flete Marítimo LCL ${Q.mult>1 && !Q.isMinVol ? `(Sobrep. ${Q.mult}x)` : ''}</td>
+    <td>$${precioUniMar.toFixed(2)}</td>
+    <td>${Q.vol} CBM / ${Q.wt} KG</td>
+    <td>Marítimo</td>
+    <td><strong>$${Q.seaFinal.toFixed(2)}</strong></td>
+  </tr>`;
+
+  // Item Terrestre (Ambos datos reflejados en la columna Volumen / Peso + Ruta Completa)
+  const precioUniTerr = Q.isMinVol ? 20.00 : (Q.lr * Q.mult);
+  htmlItems += `<tr>
+    <td>Flete Terrestre (Ruta: ${Q.destTxt})</td>
+    <td>$${precioUniTerr.toFixed(2)}</td>
+    <td>${Q.vol} CBM / ${Q.wt} KG</td>
+    <td>Terrestre</td>
+    <td><strong>$${Q.landFinal.toFixed(2)}</strong></td>
+  </tr>`;
+
+  // Items Extras
+  Q.extras.forEach(e => {
+    htmlItems += `<tr>
+      <td>${e.n}</td>
+      <td>-</td>
+      <td>${Q.vol} CBM / ${Q.wt} KG</td>
+      <td>Manejo Especial</td>
+      <td><strong>$${e.v.toFixed(2)}</strong></td>
+    </tr>`;
+  });
+
+  document.getElementById('p-items').innerHTML = htmlItems;
+  document.getElementById('p-total').textContent = Q.total.toFixed(2);
+}
+
+function sendWA(){
+  const phone='584146901410';
+  const nombre=(document.getElementById('cliente-nombre').value||'').trim();
+
+  const EM_SHIP   = '\uD83D\uDEA2';
+  const EM_BOX    = '\uD83D\uDCE6';
+  const EM_PIN    = '\uD83D\uDCCD';
+  const EM_MONEY  = '\uD83D\uDCB2';
+  const EM_TRUCK  = '\uD83D\uDE9A';
+  const EM_PLUS   = '\u2795';       
+  const EM_WARN   = '\u26A0\uFE0F'; 
+  const EM_CHECK  = '\u2705';       
+  const EM_PERSON = '\uD83D\uDC64'; 
+  const BULLET    = '\u2022';       
+  const LINE      = '\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500'; 
+
+  let t = '';
+  t += `${EM_SHIP} *COTIZACIÓN LCL — SHUN FENG*\n`;
+  t += `${LINE}\n\n`;
+
+  if(nombre){
+    t += `${EM_PERSON} *Cliente:* ${nombre}\n\n`;
+  }
+
+  t += `${EM_BOX} *Detalles de la Carga*\n`;
+  t += `${BULLET} Volumen: *${Q.vol} CBM*\n`;
+  t += `${BULLET} Peso: *${Q.wt} kg*\n`;
+  t += `${BULLET} Densidad: *${Q.density.toFixed(0)} kg/CBM*${Q.mult>1?' '+EM_WARN:'  '+EM_CHECK}\n`;
+  t += `${BULLET} Mercancía: *${Q.catTxt}*\n`;
+  if(Q.speTxt && Q.speTxt !== 'Carga general') t += `${BULLET} Condición: *${Q.speTxt}*\n`;
+  t += `\n`;
+
+  t += `${EM_PIN} *Destino:* ${Q.destTxt}\n\n`;
+
+  t += `${EM_MONEY} *Desglose de Tarifas*\n`;
+  t += `${LINE}\n`;
+  t += `${EM_SHIP} Flete Marítimo LCL:    *$${Q.seaFinal.toFixed(2)}*`;
+  if(Q.mult>1&&!Q.isMinVol) t+=` _(${Q.multLbl})_`;
+  if(Q.isMinVol) t+=` _(mínimo fijo)_`;
+  t += `\n`;
+  t += `${EM_TRUCK} Flete Terrestre:         *$${Q.landFinal.toFixed(2)}*`;
+  if(Q.mult>1&&!Q.isMinVol) t+=` _(${Q.multLbl})_`;
+  if(Q.isMinVol) t+=` _(mínimo fijo)_`;
+  t += `\n`;
+
+  if(Q.extras.length>0){
+    Q.extras.forEach(e=>{
+      t+=`${EM_PLUS} ${e.n}:  *$${e.v.toFixed(2)}*\n`;
+    });
+  }
+
+  t += `${LINE}\n`;
+  t += `${EM_CHECK} *TOTAL ESTIMADO: $${Q.total.toFixed(2)}*\n\n`;
+
+  if(Q.isMinVol){
+    t += `${EM_WARN} *ATENCIÓN:* Carga menor a 0.125 CBM${Q.mult>1?' con sobrepeso':''}. Requiere confirmación de tarifas y viabilidad con el asesor antes del despacho.\n\n`;
+  } else if(Q.mult>1){
+    t += `${EM_WARN} *Nota sobrepeso:* Recargo ${Q.multLbl} aplicado en marítimo y terrestre.\n\n`;
+  }
+
+  t += `_Cotización estimada sujeta a confirmación de espacio y condiciones finales._`;
+
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(t)}`,'_blank');
+}
+  </script>
+</body>
+</html>
