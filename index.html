@@ -91,38 +91,28 @@
     .card{padding:18px}
   }
 
-  /* --- INICIO: ESTILOS EXCLUSIVOS PARA IMPRESIÓN PDF --- */
+  /* --- ESTILOS EXCLUSIVOS PARA IMPRESIÓN PDF --- */
   .print-area { display: none; }
   
   @media print {
     body { background: #fff !important; color: #000; padding: 0; margin: 0; }
-    /* Ocultamos por completo la calculadora del móvil */
     .wrap { display: none !important; }
-    /* Mostramos y adaptamos la hoja tamaño carta */
     .print-area { display: block; font-family: 'Arial', sans-serif; padding: 10px 30px; }
-    
     .print-header { display: flex; align-items: center; border-bottom: 2px solid var(--acc); padding-bottom: 15px; margin-bottom: 20px; }
     .print-header img { width: 140px; margin-right: 20px; }
     .print-titles h2 { color: var(--p); margin: 0; font-size: 24px; font-weight: 800; letter-spacing: 0.5px; }
     .print-titles h3 { color: var(--muted); margin: 0; font-size: 14px; font-weight: 500; margin-top: 2px;}
-    
     .print-table-info { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
     .print-table-info td { border: 1px solid #333; padding: 10px 12px; font-size: 12px; width: 50%; }
-    
     .print-table-items { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
     .print-table-items th { background: var(--acc); color: #fff; padding: 10px; font-size: 11px; font-weight: bold; border: 1px solid #333; text-align: center; text-transform: uppercase; }
     .print-table-items td { border: 1px solid #333; padding: 10px; font-size: 12px; text-align: center; }
     .print-table-items td:first-child { text-align: left; }
-    
     .print-total-row td { background: var(--p); color: #fff; font-weight: bold; font-size: 14px; text-align: right; padding: 12px 15px; border: 1px solid #333;}
-    
     .print-terms { margin-top: 25px; font-size: 10px; color: #444; line-height: 1.4; border-top: 1px solid #ddd; padding-top: 15px; }
     .print-terms ul { margin: 8px 0 15px 25px; }
-    
     @page { margin: 1cm; size: letter; }
   }
-  /* --- FIN: ESTILOS IMPRESIÓN PDF --- */
-
 </style>
  </head>
  <body data-template-id="__page-root">
@@ -227,7 +217,7 @@
     
     <table class="print-table-info">
       <tr>
-        <td><strong>AGENCIA:</strong> LADIN CLOUD / LOGISTICA SHUNFENG</td>
+        <td id="p-agencia-titulo"><strong>AGENCIA:</strong> LADIN CLOUD / LOGISTICA SHUNFENG</td>
         <td><strong>FECHA:</strong> <span id="p-fecha"></span></td>
       </tr>
       <tr>
@@ -246,8 +236,7 @@
           <th>TOTAL ESTIMADO</th>
         </tr>
       </thead>
-      <tbody id="p-items">
-        </tbody>
+      <tbody id="p-items"></tbody>
       <tr class="print-total-row">
         <td colspan="4">TOTAL COTIZADO:</td>
         <td>$<span id="p-total"></span></td>
@@ -263,8 +252,35 @@
       <p><strong>NOTA IMPORTANTE:</strong> Las tarifas mínimas fijas de $85 (marítimo) y $20 (terrestre) aplican a volúmenes menores a 0.125 CBM. Todo envío debe tener código de cliente y destino visible en sus etiquetas. Esta cotización es un <strong>estimado referencial</strong> basado en las medidas declaradas por el cliente. Las medidas finales e importes serán verificados al momento de ingresar la mercancía a nuestros almacenes en China.</p>
     </div>
   </div>
+
   <script>
 let Q={};
+
+// ==========================================
+// 🚨 NUEVO: ASIGNACIÓN DINÁMICA DE ASESORES
+// ==========================================
+
+// Directorio maestro con los teléfonos y nombres de cada vendedor
+const directorioVendedores = {
+  'jose': { nombre: 'Jose', telefono: '584127770844' }, // Datos de Jose (Reemplazar número real)
+  'maria':  { nombre: 'María',  telefono: '584127770357' }  // Datos de María (Reemplazar número real)
+};
+
+// Configuración por defecto de la organización central
+let vendedorActivo = { nombre: 'LADIN CLOUD / LOGISTICA SHUNFENG', telefono: '584146901410' };
+
+// Procesa el enlace para buscar el parámetro '?v='
+const urlParams = new URLSearchParams(window.location.search);
+const vParam = urlParams.get('v');
+
+// Si el parámetro coincide con un vendedor del directorio, se activa de inmediato
+if (vParam && directorioVendedores[vParam.toLowerCase()]) {
+  vendedorActivo = directorioVendedores[vParam.toLowerCase()];
+}
+
+// ==========================================
+// FUNCIONES LÓGICAS DE LA CALCULADORA
+// ==========================================
 
 function onInput(){
   const v=parseFloat(document.getElementById('vol').value);
@@ -309,7 +325,7 @@ function calc(){
   const spe=document.getElementById('spe').value;
   const lr=parseFloat(document.getElementById('dest').value);
   const destSel=document.getElementById('dest');
-  const destTxt=destSel.options[destSel.selectedIndex].text; // Muestra la ruta completa
+  const destTxt=destSel.options[destSel.selectedIndex].text; // Captura la ruta completa
 
   const density=wt/vol;
   const isMinVol=vol<0.125;
@@ -409,8 +425,7 @@ function calc(){
     alerts+=`<div class="alert-box alert-danger">
       <strong>⚠ Carga menor a 0.125 CBM — Confirmar con asesor</strong>
       Los montos mostrados corresponden a tarifas mínimas fijas ($85 marítimo / $20 terrestre). 
-      ${mult>1?'Adicionalmente, esta carga presenta sobrepeso. ':''}Debido al volumen reducido${mult>1?' y la densidad elevada':''}, 
-      es obligatorio confirmar recargos exactos, viabilidad operativa y condiciones especiales directamente con el asesor antes de procesar el despacho.
+      ${mult>1?'Adicionalmente, esta carga presenta sobrepeso. ':''}Debido al volumen reducido, es obligatorio confirmar condiciones especiales.
     </div>`;
   }
   if(mult>1&&!isMinVol){
@@ -420,21 +435,17 @@ function calc(){
       Se aplica multiplicador <strong>${mult}×</strong> sobre flete marítimo y flete terrestre. 
     </div>`;
   }
-  if(cat==='maquinaria'&&vol>0&&vol<0.3&&!isMinVol){
-    alerts+=`<div class="alert-box alert-info">
-      <strong>Nota — Maquinaria pequeña</strong>
-      Para maquinaria menor a 0.3 CBM no se aplica extra tabular. Verifica con el asesor si corresponde algún cargo por manejo especial.
-    </div>`;
-  }
 
   document.getElementById('alerts').innerHTML=alerts;
   
+  // Sincroniza y rellena los datos en la tabla imprimible del PDF
   updatePrintView();
 
   document.getElementById('results').style.display='block';
   document.getElementById('results').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
+// NUEVA FUNCIÓN: RENDERIZA LA TABLA DEL PDF INCORPORANDO AMBOS DATOS (CBM / KG) Y EL ASESOR
 function updatePrintView() {
   const now = new Date();
   document.getElementById('p-fecha').textContent = now.toLocaleDateString('es-VE');
@@ -446,9 +457,12 @@ function updatePrintView() {
   if (Q.speTxt !== 'Carga general') merc += ` (Condición: ${Q.speTxt})`;
   document.getElementById('p-mercancia').textContent = merc;
 
+  // Modifica dinámicamente el título de la casilla Agencia usando el vendedor activo
+  document.getElementById('p-agencia-titulo').innerHTML = `<strong>AGENCIA / ASESOR:</strong> ${vendedorActivo.nombre.toUpperCase()} - LOGISTICA SHUNFENG`;
+
   let htmlItems = '';
   
-  // Item Marítimo (Ambos datos reflejados en la columna Volumen / Peso)
+  // Flete Marítimo (Se renderizan CBM / KG juntos en la columna de volumen/peso)
   const precioUniMar = Q.isMinVol ? 85.00 : (Q.baseRate * Q.mult);
   htmlItems += `<tr>
     <td>Flete Marítimo LCL ${Q.mult>1 && !Q.isMinVol ? `(Sobrep. ${Q.mult}x)` : ''}</td>
@@ -458,7 +472,7 @@ function updatePrintView() {
     <td><strong>$${Q.seaFinal.toFixed(2)}</strong></td>
   </tr>`;
 
-  // Item Terrestre (Ambos datos reflejados en la columna Volumen / Peso + Ruta Completa)
+  // Flete Terrestre (Muestra la ruta completa exacta sin recortes y combina CBM / KG)
   const precioUniTerr = Q.isMinVol ? 20.00 : (Q.lr * Q.mult);
   htmlItems += `<tr>
     <td>Flete Terrestre (Ruta: ${Q.destTxt})</td>
@@ -468,7 +482,7 @@ function updatePrintView() {
     <td><strong>$${Q.landFinal.toFixed(2)}</strong></td>
   </tr>`;
 
-  // Items Extras
+  // Filas Extras de Manejo Especial si aplican
   Q.extras.forEach(e => {
     htmlItems += `<tr>
       <td>${e.n}</td>
@@ -484,7 +498,8 @@ function updatePrintView() {
 }
 
 function sendWA(){
-  const phone='584127770844'; // Número de WhatsApp del asesor (con código de país, sin espacios ni guiones)
+  // El botón de enviar ahora toma el número del asesor activo dinámicamente
+  const phone = vendedorActivo.telefono;
   const nombre=(document.getElementById('cliente-nombre').value||'').trim();
 
   const EM_SHIP   = '\uD83D\uDEA2';
@@ -538,7 +553,7 @@ function sendWA(){
   t += `${EM_CHECK} *TOTAL ESTIMADO: $${Q.total.toFixed(2)}*\n\n`;
 
   if(Q.isMinVol){
-    t += `${EM_WARN} *ATENCIÓN:* Carga menor a 0.125 CBM${Q.mult>1?' con sobrepeso':''}. Requiere confirmación de tarifas y viabilidad con el asesor antes del despacho.\n\n`;
+    t += `${EM_WARN} *ATENCIÓN:* Carga menor a 0.125 CBM. Requiere confirmación de tarifas con el asesor antes del despacho.\n\n`;
   } else if(Q.mult>1){
     t += `${EM_WARN} *Nota sobrepeso:* Recargo ${Q.multLbl} aplicado en marítimo y terrestre.\n\n`;
   }
